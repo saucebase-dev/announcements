@@ -1,0 +1,10 @@
+{
+  "name": "Announcements",
+  "alias": "announcements",
+  "description": "Site-wide announcement banners",
+  "author": "Saucebase",
+  "version": "v0.0.1",
+  "priority": 0,
+  "providers": ["Modules\\Announcements\\Providers\\AnnouncementsServiceProvider"],
+  "files": []
+}
