@@ -80,6 +80,5 @@ npx playwright test --project="@Announcements*"                         # E2E
 
 - No frontend routes or pages — this module is admin-only; the banner is rendered by core `App.vue`
 - The two core patches (`app-vue.patch`, `types.patch`) are required for the banner to appear; without them the component is never mounted
-- `routes/navigation.php` must be empty — there is no user-facing navigation item
 - Cookie is set for 1 year (60 × 24 × 365 minutes); users (or the app) can clear/overwrite it to re-show the same announcement, but if you want to re-show to users who dismissed it without touching cookies, publish a new announcement (new ID)
 - `show_on_frontend` / `show_on_dashboard` are independent — an announcement can target one or both audiences
