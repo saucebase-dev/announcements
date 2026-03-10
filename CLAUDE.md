@@ -66,7 +66,7 @@ The module ships two patches that must be applied to the core app:
 ## Testing
 
 ```bash
-php artisan test --testsuite=Modules --filter='Modules.Announcements'  # PHPUnit
+php artisan test --testsuite=Modules --filter='^Modules\\Announcements\\Tests'  # PHPUnit
 npx playwright test --project="@Announcements*"                         # E2E
 ```
 
