@@ -9,6 +9,10 @@ class AnnouncementsDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (Announcement::exists()) {
+            return;
+        }
+
         Announcement::firstOrCreate(
             ['text' => '🎉 <strong>Announcements module is live!</strong> Manage banners like this one from the <a href="/admin/announcements">admin panel</a>.'],
             [
