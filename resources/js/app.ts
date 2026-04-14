@@ -1,6 +1,6 @@
 import { registerGlobalComponent } from '@/lib/globalComponents';
-import AnnouncementBanner from './components/AnnouncementBanner.vue';
 import '../css/style.css';
+import AnnouncementBanner from './components/AnnouncementBanner.vue';
 
 /**
  * Announcements module setup
