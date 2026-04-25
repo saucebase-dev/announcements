@@ -9,11 +9,11 @@ tasks:
 
     test:e2e:
         desc: Run E2E tests for Announcements module
-        cmd: npx playwright test --project="@Announcements*" {{.CLI_ARGS}}
+        cmd: npx playwright test --project="@announcements*" {{.CLI_ARGS}}
         interactive: true
 
     # ── Code Generation ────────────────────────────────────────────
 
     types:generate:
         desc: Generate TypeScript types from PHP DTOs and enums
-        cmd: php artisan module:generate-types Announcements
+        cmd: php artisan module:generate-types announcements
