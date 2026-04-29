@@ -12,6 +12,12 @@ tasks:
         cmd: npx playwright test --project="@announcements*" {{.CLI_ARGS}}
         interactive: true
 
+    # ── Database ──────────────────────────────────────────────────
+
+    db:seed:
+        desc: Seed the Announcements module database
+        cmd: php artisan modules:seed --module=announcements
+
     # ── Code Generation ────────────────────────────────────────────
 
     types:generate:
