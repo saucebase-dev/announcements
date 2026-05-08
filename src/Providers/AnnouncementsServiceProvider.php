@@ -8,14 +8,6 @@ use Modules\Announcements\Models\Announcement;
 
 class AnnouncementsServiceProvider extends ModuleServiceProvider
 {
-    protected string $name = 'Announcements';
-
-    protected string $nameLower = 'announcements';
-
-    protected array $providers = [
-        RouteServiceProvider::class,
-    ];
-
     protected function shareInertiaData(): void
     {
         Inertia::share('announcement', function () {
