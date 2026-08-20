@@ -1,4 +1,5 @@
 import { expect, test } from '@e2e/fixtures';
+import { isModuleInstalled } from '@e2e/helpers/modules';
 
 test.describe('Announcement Banner', () => {
     test.describe.configure({ mode: 'serial' });
@@ -43,6 +44,12 @@ test.describe('Announcement Banner', () => {
         credentials,
         loginAs,
     }) => {
+        // Core has no authenticated page besides `/dashboard` (routes/web.php),
+        // and tenancy funnels authenticated visitors away from it when
+        // installed — skip rather than assert on a page this module doesn't
+        // control in that combination.
+        test.skip(await isModuleInstalled(laravel, 'tenancy'), 'no tenancy-safe authenticated page to check the dashboard banner on');
+
         await laravel.factory('Modules\\Announcements\\Models\\Announcement', {
             text: 'Dashboard announcement',
             is_active: true,
@@ -61,6 +68,8 @@ test.describe('Announcement Banner', () => {
         credentials,
         loginAs,
     }) => {
+        test.skip(await isModuleInstalled(laravel, 'tenancy'), 'no tenancy-safe authenticated page to check the dashboard banner on');
+
         await laravel.factory('Modules\\Announcements\\Models\\Announcement', {
             text: 'Hidden on dashboard',
             is_active: true,
