@@ -95,7 +95,7 @@ test.describe('Announcement Banner', () => {
         await page.goto('/');
         await expect(page.getByText('Dismissable banner')).toBeVisible();
 
-        await page.getByRole('button', { name: 'Dismiss announcement' }).click();
+        await page.getByTestId('announcement-dismiss').click();
         await expect(page.getByText('Dismissable banner')).not.toBeVisible();
 
         await page.reload();
@@ -115,7 +115,7 @@ test.describe('Announcement Banner', () => {
         await page.goto('/');
         await expect(page.getByText('Non-dismissable banner')).toBeVisible();
         await expect(
-            page.getByRole('button', { name: 'Dismiss announcement' }),
+            page.getByTestId('announcement-dismiss'),
         ).not.toBeVisible();
     });
 

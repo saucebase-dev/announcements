@@ -11,6 +11,12 @@
     }
   ],
   "extra": {
+    "saucebase": {
+      "frameworks": [
+        "vue",
+        "react"
+      ]
+    },
     "laravel": {
       "providers": [
         "Modules\\Announcements\\Providers\\AnnouncementsServiceProvider"

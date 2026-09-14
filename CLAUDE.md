@@ -10,7 +10,7 @@ Site-wide announcement banners with scheduling, audience targeting, and dismissa
 | Model | `Announcement` (text, is_active, is_dismissable, show_on_frontend, show_on_dashboard, starts_at, ends_at, created_by) |
 | Provider | `AnnouncementsServiceProvider` — extends `ModuleServiceProvider`, shares active announcement as Inertia prop via `shareInertiaData()` |
 | Filament | `AnnouncementsPlugin`, `AnnouncementResource` (List, Create, Edit), `AnnouncementForm`, `AnnouncementsTable` |
-| Component | `AnnouncementBanner.vue` — sticky banner rendered in core `App.vue` |
+| Component | `AnnouncementBanner` (`vue/components/AnnouncementBanner.vue`, `react/components/AnnouncementBanner.tsx`) — sticky banner registered in the `top` global component slot |
 | Types | `resources/js/types/index.ts` — `Announcement` interface |
 
 ## Routes
@@ -43,17 +43,13 @@ Two boolean flags on the model:
 - `show_on_frontend` — show on public (unauthenticated) pages
 - `show_on_dashboard` — show on authenticated pages
 
-`AnnouncementBanner.vue` checks the authenticated state and the appropriate flag before rendering.
+`AnnouncementBanner` checks the authenticated state and the appropriate flag before rendering.
 
 ### Creator Tracking
 `CreateAnnouncement::mutateFormDataBeforeCreate()` sets `created_by = auth()->id()` automatically.
 
 ### Core Integration
-The module ships one patch that must be applied to the core app:
-
-| Patch | Change |
-|-------|--------|
-| `patches/app-vue.patch` | Imports `AnnouncementBanner` and adds it to `App.vue` template |
+No patches. Each framework's `app` entry calls `registerGlobalComponent('top', AnnouncementBanner)` in `setup()`, and core renders the `top` slot. Vue and React must stay in sync.
 
 The `announcement` TypeScript type is handled automatically via `resources/js/types/page-props.d.ts`, which augments `@inertiajs/core`'s `PageProps` — no manual core edit required.
 
@@ -79,7 +75,7 @@ npx playwright test --project="@announcements*"                         # E2E
 
 ## Gotchas
 
-- No frontend routes or pages — this module is admin-only; the banner is rendered by core `App.vue`
-- Only `app-vue.patch` is required for the banner to appear; without it the component is never mounted. TypeScript types are automatic via `page-props.d.ts`
+- No frontend routes or pages — this module is admin-only; the banner mounts through the `top` global component slot
+- The Vue banner animates out on dismiss; the React banner unmounts immediately
 - Cookie is set for 1 year (60 × 24 × 365 minutes); users (or the app) can clear/overwrite it to re-show the same announcement, but if you want to re-show to users who dismissed it without touching cookies, publish a new announcement (new ID)
 - `show_on_frontend` / `show_on_dashboard` are independent — an announcement can target one or both audiences
