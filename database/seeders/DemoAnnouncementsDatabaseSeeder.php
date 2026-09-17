@@ -5,7 +5,7 @@ namespace Modules\Announcements\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Modules\Announcements\Models\Announcement;
 
-class AnnouncementsDatabaseSeeder extends Seeder
+class DemoAnnouncementsDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
