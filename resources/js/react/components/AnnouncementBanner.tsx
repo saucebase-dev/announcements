@@ -1,5 +1,4 @@
 import { router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
 import IconXMark from '~icons/heroicons/x-mark';
 import type { Announcement } from '../../types';
 
@@ -7,9 +6,8 @@ export default function AnnouncementBanner() {
     const page = usePage();
     const announcement = (page.props?.announcement as Announcement) ?? null;
     const isAuthenticated = !!page.props?.auth?.user;
-    const [isDismissed, setIsDismissed] = useState(false);
 
-    if (isDismissed || !announcement) {
+    if (!announcement) {
         return null;
     }
 
@@ -21,9 +19,14 @@ export default function AnnouncementBanner() {
         return null;
     }
 
+    /**
+     * The banner goes when the server says so, not on the click.
+     *
+     * Hiding it locally first raced the request that stores the cookie: a
+     * reload right after the click brought the banner back, because nothing
+     * had been written yet.
+     */
     function dismiss() {
-        setIsDismissed(true);
-
         router.post(
             route('announcements.dismiss', { announcement: announcement.id }),
             {},

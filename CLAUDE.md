@@ -71,11 +71,13 @@ npx playwright test --project="@announcements*"                         # E2E
 
 **Feature coverage** (`tests/Feature/AnnouncementResourceTest.php`): Filament CRUD, Inertia prop sharing, dismissed cookie suppression, dismiss route sets cookie.
 
-**E2E coverage** (`tests/e2e/tests/announcement.spec.ts`): banner visibility on public/dashboard, dismiss persists across reload, no dismiss button when non-dismissable, schedule window (with time travel).
+**E2E coverage** (`tests/e2e/tests/announcement.spec.ts`): banner visibility on public/dashboard, dismiss persists across reload, no dismiss button when non-dismissable, schedule window.
+
+The schedule tests write their window around the real clock. Never use `laravel.travel()` here: it moves the server clock for every Playwright worker, and a login running in another project at that moment is handed a session stamped in the travelled past, which the next real-time request treats as expired.
 
 ## Gotchas
 
 - No frontend routes or pages — this module is admin-only; the banner mounts through the `top` global component slot
-- The Vue banner animates out on dismiss; the React banner unmounts immediately
+- The banner is removed by the server, not by the click: it disappears when the response comes back without the `announcement` prop. Hiding it locally first raced the request that writes the cookie, so a reload straight after dismissing brought it back
 - Cookie is set for 1 year (60 × 24 × 365 minutes); users (or the app) can clear/overwrite it to re-show the same announcement, but if you want to re-show to users who dismissed it without touching cookies, publish a new announcement (new ID)
 - `show_on_frontend` / `show_on_dashboard` are independent — an announcement can target one or both audiences
