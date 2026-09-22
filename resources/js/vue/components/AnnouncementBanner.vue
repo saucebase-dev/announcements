@@ -2,7 +2,7 @@
 import { router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import IconXMark from '~icons/heroicons/x-mark';
-import { Announcement } from '../types';
+import type { Announcement } from '../../types';
 
 const page = usePage();
 
