@@ -65,7 +65,7 @@ Only one announcement shows at a time — the most recent active one.
 
 ## Extending
 
-**Change the look.** The banner is a normal component in `resources/js/vue/components/` and `resources/js/react/components/`. Edit it like any other.
+**Change the look.** The banner is a normal component, `resources/js/components/AnnouncementBanner`. Edit it like any other.
 
 **Change the cookie.** Dismissals are stored in a cookie named `saucebase_announcement_dismissed`. Rename it in `config/announcements.php` if it clashes with something.
 
