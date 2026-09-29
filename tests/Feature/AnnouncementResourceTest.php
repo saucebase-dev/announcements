@@ -2,7 +2,6 @@
 
 namespace Modules\Announcements\Tests\Feature;
 
-use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -25,7 +24,7 @@ class AnnouncementResourceTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->create(['email_verified_at' => now()]);
-        $this->admin->assignRole(Role::ADMIN);
+        $this->admin->assignRole('admin');
     }
 
     public function test_can_list_announcements_in_filament(): void
