@@ -30,11 +30,6 @@ class AnnouncementResource extends Resource
         return AnnouncementsTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
     public static function getPages(): array
     {
         return [
