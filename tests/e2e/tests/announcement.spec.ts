@@ -110,7 +110,14 @@ test.describe('Announcement Banner', () => {
         await page.goto('/');
         await expect(page.getByText('Dismissable banner')).toBeVisible();
 
-        await page.getByTestId('announcement-dismiss').click();
+        // The banner hides on click; the cookie that keeps it hidden arrives with
+        // the response, so reloading before it lands would bring it back.
+        await Promise.all([
+            page.waitForResponse((response) =>
+                response.url().includes('/dismiss'),
+            ),
+            page.getByTestId('announcement-dismiss').click(),
+        ]);
         await expect(page.getByText('Dismissable banner')).not.toBeVisible();
 
         await page.reload();
