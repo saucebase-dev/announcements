@@ -71,7 +71,7 @@ function dismiss() {
                 type="button"
                 class="absolute top-1/2 right-4 -translate-y-1/2 p-1.5 text-white opacity-80 transition hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 data-testid="announcement-dismiss"
-                :aria-label="'Dismiss announcement'"
+                :aria-label="$t('Dismiss announcement')"
                 @click="dismiss"
             >
                 <IconXMark class="size-5" aria-hidden="true" />
