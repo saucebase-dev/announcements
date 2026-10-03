@@ -1,9 +1,11 @@
+import { useT } from '@/i18n';
 import { router, usePage } from '@inertiajs/react';
 import IconXMark from '~icons/heroicons/x-mark';
 import type { Announcement } from '../../types';
 
 export default function AnnouncementBanner() {
     const page = usePage();
+    const t = useT();
     const announcement = (page.props?.announcement as Announcement) ?? null;
     const isAuthenticated = !!page.props?.auth?.user;
 
@@ -51,7 +53,7 @@ export default function AnnouncementBanner() {
                     type="button"
                     className="absolute top-1/2 right-4 -translate-y-1/2 p-1.5 text-white opacity-80 transition hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                     data-testid="announcement-dismiss"
-                    aria-label="Dismiss announcement"
+                    aria-label={t('Dismiss announcement')}
                     onClick={dismiss}
                 >
                     <IconXMark className="size-5" aria-hidden="true" />
