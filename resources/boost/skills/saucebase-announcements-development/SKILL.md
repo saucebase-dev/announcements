@@ -30,6 +30,10 @@ No frontend pages — admin-only via Filament.
 
 ## Patterns
 
+### Admin Permission
+
+`manage announcements` covers the admin area: `AnnouncementResource` checks it in `canAccess()`. `access admin panel` alone only opens the panel. `Database\Seeders\DatabaseSeeder` creates it, granted to nobody; the app's roles seeder decides who gets it, and `admin` passes every check.
+
 ### Active Scope
 `Announcement::active()` scope filters by: `is_active = true`, within `starts_at`/`ends_at` window (nulls mean open-ended), ordered by latest first.
 
