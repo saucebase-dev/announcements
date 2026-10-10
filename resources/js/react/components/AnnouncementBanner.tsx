@@ -1,5 +1,5 @@
-import { useT } from '@/i18n';
 import { router, usePage } from '@inertiajs/react';
+import { useT } from '@saucebase/react/i18n';
 import IconXMark from '~icons/heroicons/x-mark';
 import type { Announcement } from '../../types';
 
