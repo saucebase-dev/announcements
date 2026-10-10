@@ -1,5 +1,5 @@
-import { registerGlobalComponent } from '@/lib/globalComponents';
 import '@modules/announcements/resources/css/style.css';
+import { registerGlobalComponent } from '@saucebase/vue/lib/globalComponents';
 import AnnouncementBanner from './components/AnnouncementBanner.vue';
 
 /**
