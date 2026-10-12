@@ -5,5 +5,3 @@ import AnnouncementBanner from './components/AnnouncementBanner';
 export function setup() {
     registerGlobalComponent('top', AnnouncementBanner);
 }
-
-export function afterMount() {}
