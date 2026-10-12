@@ -1,10 +1,20 @@
 import { expect, test } from '@e2e/fixtures';
+import { isModuleInstalled } from '@e2e/helpers/modules';
+
+/** A date `days` away from now, as the `Y-m-d H:i:s` the factory expects. */
+function isoOffsetFromNow(days: number): string {
+    const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
+    return date.toISOString().slice(0, 19).replace('T', ' ');
+}
 
 test.describe('Announcement Banner', () => {
     test.describe.configure({ mode: 'serial' });
 
     test.beforeEach(async ({ laravel }) => {
-        await laravel.callFunction('Modules\\Announcements\\Tests\\Support\\AnnouncementTestHelper::clean');
+        await laravel.callFunction(
+            'Modules\\Announcements\\Tests\\Support\\AnnouncementTestHelper::clean',
+        );
     });
 
     test('banner is visible on public page when active and show_on_frontend is true', async ({
@@ -43,6 +53,15 @@ test.describe('Announcement Banner', () => {
         credentials,
         loginAs,
     }) => {
+        // Core has no authenticated page besides `/dashboard` (routes/web.php),
+        // and tenancy funnels authenticated visitors away from it when
+        // installed — skip rather than assert on a page this module doesn't
+        // control in that combination.
+        test.skip(
+            await isModuleInstalled(laravel, 'tenancy'),
+            'no tenancy-safe authenticated page to check the dashboard banner on',
+        );
+
         await laravel.factory('Modules\\Announcements\\Models\\Announcement', {
             text: 'Dashboard announcement',
             is_active: true,
@@ -61,6 +80,11 @@ test.describe('Announcement Banner', () => {
         credentials,
         loginAs,
     }) => {
+        test.skip(
+            await isModuleInstalled(laravel, 'tenancy'),
+            'no tenancy-safe authenticated page to check the dashboard banner on',
+        );
+
         await laravel.factory('Modules\\Announcements\\Models\\Announcement', {
             text: 'Hidden on dashboard',
             is_active: true,
@@ -86,7 +110,14 @@ test.describe('Announcement Banner', () => {
         await page.goto('/');
         await expect(page.getByText('Dismissable banner')).toBeVisible();
 
-        await page.getByRole('button', { name: 'Dismiss announcement' }).click();
+        // The banner hides on click; the cookie that keeps it hidden arrives with
+        // the response, so reloading before it lands would bring it back.
+        await Promise.all([
+            page.waitForResponse((response) =>
+                response.url().includes('/dismiss'),
+            ),
+            page.getByTestId('announcement-dismiss').click(),
+        ]);
         await expect(page.getByText('Dismissable banner')).not.toBeVisible();
 
         await page.reload();
@@ -106,10 +137,17 @@ test.describe('Announcement Banner', () => {
         await page.goto('/');
         await expect(page.getByText('Non-dismissable banner')).toBeVisible();
         await expect(
-            page.getByRole('button', { name: 'Dismiss announcement' }),
+            page.getByTestId('announcement-dismiss'),
         ).not.toBeVisible();
     });
 
+    /**
+     * The window is written around the real clock rather than travelled to.
+     *
+     * `laravel.travel()` moves the server's clock for every worker, and a login
+     * happening in another project at that moment gets a session stamped in the
+     * travelled past, which the next real-time request treats as expired.
+     */
     test('banner is visible when current time is within the schedule window', async ({
         page,
         laravel,
@@ -118,18 +156,16 @@ test.describe('Announcement Banner', () => {
             text: 'Scheduled announcement',
             is_active: true,
             show_on_frontend: true,
-            starts_at: '2026-06-01 00:00:00',
-            ends_at: '2026-06-30 23:59:59',
+            starts_at: isoOffsetFromNow(-1),
+            ends_at: isoOffsetFromNow(1),
         });
-
-        await laravel.travel('2026-06-15 12:00:00');
 
         await page.goto('/');
 
         await expect(page.getByText('Scheduled announcement')).toBeVisible();
     });
 
-     test('banner is not visible when current time is outside the schedule window', async ({
+    test('banner is not visible when current time is outside the schedule window', async ({
         page,
         laravel,
     }) => {
@@ -137,14 +173,14 @@ test.describe('Announcement Banner', () => {
             text: 'Scheduled announcement',
             is_active: true,
             show_on_frontend: true,
-            starts_at: '2026-06-01 00:00:00',
-            ends_at: '2026-06-30 23:59:59',
+            starts_at: isoOffsetFromNow(1),
+            ends_at: isoOffsetFromNow(2),
         });
-
-        await laravel.travel('2026-07-01 00:00:00');
 
         await page.goto('/');
 
-        await expect(page.getByText('Scheduled announcement')).not.toBeVisible();
+        await expect(
+            page.getByText('Scheduled announcement'),
+        ).not.toBeVisible();
     });
 });

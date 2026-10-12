@@ -2,9 +2,9 @@
 
 namespace Modules\Announcements\Providers;
 
-use App\Providers\ModuleServiceProvider;
 use Inertia\Inertia;
 use Modules\Announcements\Models\Announcement;
+use Saucebase\Core\Providers\ModuleServiceProvider;
 
 class AnnouncementsServiceProvider extends ModuleServiceProvider
 {

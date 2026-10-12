@@ -1,5 +1,5 @@
-import { registerGlobalComponent } from '@/lib/globalComponents';
 import '@modules/announcements/resources/css/style.css';
+import { registerGlobalComponent } from '@saucebase/vue/lib/globalComponents';
 import AnnouncementBanner from './components/AnnouncementBanner.vue';
 
 /**
@@ -9,9 +9,3 @@ import AnnouncementBanner from './components/AnnouncementBanner.vue';
 export function setup() {
     registerGlobalComponent('top', AnnouncementBanner);
 }
-
-/**
- * Announcements module after mount logic
- * Called after the app has been mounted
- */
-export function afterMount() {}

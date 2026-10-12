@@ -4,6 +4,9 @@
   "type": "saucebase-module",
   "license": "proprietary",
   "version": "v2.1.0",
+  "require": {
+    "saucebase/core": "^1.6"
+  },
   "authors": [
     {
       "name": "Saucebase",
@@ -11,6 +14,12 @@
     }
   ],
   "extra": {
+    "saucebase": {
+      "frameworks": [
+        "vue",
+        "react"
+      ]
+    },
     "laravel": {
       "providers": [
         "Modules\\Announcements\\Providers\\AnnouncementsServiceProvider"

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->timestamp('ends_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
+
+            $table->index('created_by');
         });
     }
 

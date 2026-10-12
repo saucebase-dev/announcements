@@ -49,21 +49,28 @@ class Announcement extends Model
         ];
     }
 
+    /** @return BelongsTo<User, $this> */
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
     public function scopeActive(Builder $query): Builder
     {
         return $query
             ->where('is_active', true)
-            ->where(function ($query) {
-                $query->whereNull('starts_at')->orWhere('starts_at', '<=', now());
-            })
-            ->where(function ($query) {
-                $query->whereNull('ends_at')->orWhere('ends_at', '>=', now());
-            })
+            ->where(
+                fn (Builder $query) => $query
+                    ->whereNull('starts_at')
+                    ->orWhere('starts_at', '<=', now())
+            )
+            ->where(fn (Builder $query) => $query
+                ->whereNull('ends_at')
+                ->orWhere('ends_at', '>=', now()))
             ->latest();
     }
 }

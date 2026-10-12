@@ -14,9 +14,9 @@ tasks:
 
     # ── Database ──────────────────────────────────────────────────
 
-    db:seed:
-        desc: Seed the Announcements module database
-        cmd: php artisan modules:seed --module=announcements
+    db:seed:demo:
+        desc: Seed the Announcements module with sample content
+        cmd: '{{.APP}} php artisan modules:seed --module=announcements --demo'
 
     # ── Code Generation ────────────────────────────────────────────
 

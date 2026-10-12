@@ -1,9 +1,3 @@
-/*
-* Note: This file contains CSS modifications for the module.
-* Used to apply specific styling changes and customizations
-* to enhance the module's appearance and layout.
-*/
-
 :root {
     --announcement-banner-spaces: 16;
     --announcement-banner-height: calc(

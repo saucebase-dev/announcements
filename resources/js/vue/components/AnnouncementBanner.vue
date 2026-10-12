@@ -2,7 +2,7 @@
 import { router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import IconXMark from '~icons/heroicons/x-mark';
-import { Announcement } from '../types';
+import type { Announcement } from '../../types';
 
 const page = usePage();
 
@@ -70,7 +70,8 @@ function dismiss() {
                 v-if="announcement.is_dismissable"
                 type="button"
                 class="absolute top-1/2 right-4 -translate-y-1/2 p-1.5 text-white opacity-80 transition hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                :aria-label="'Dismiss announcement'"
+                data-testid="announcement-dismiss"
+                :aria-label="$t('Dismiss announcement')"
                 @click="dismiss"
             >
                 <IconXMark class="size-5" aria-hidden="true" />
