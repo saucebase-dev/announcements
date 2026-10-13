@@ -24,7 +24,7 @@ class DemoAnnouncementsDatabaseSeeder extends Seeder
         }
 
         Announcement::create([
-            'text' => '🎉 <strong>Saucebase 3.0 is here!</strong> Much faster, better DX, and now ships with Vue 3 and React 19. <a href="/blog/vue-or-react-what-about-both">Learn more →</a>',
+            'text' => '⭐ <strong>Enjoying Saucebase?</strong> A star on GitHub helps other developers find it. <a href="https://github.com/saucebase-dev/saucebase">Star us on GitHub →</a>',
             'is_active' => true,
             'is_dismissable' => true,
             'show_on_frontend' => true,
