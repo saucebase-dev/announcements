@@ -1,82 +1,59 @@
-# Announcements Module
+# Saucebase Announcements
 
 <div align="center">
 
 [![Tests](https://github.com/saucebase-dev/announcements/actions/workflows/test.yml/badge.svg)](https://github.com/saucebase-dev/announcements/actions/workflows/test.yml)
 [![Release](https://img.shields.io/github/v/release/saucebase-dev/announcements)](https://github.com/saucebase-dev/announcements/releases)
-[![Saucebase Core](https://img.shields.io/badge/Saucebase_Core-1.6+-FF6B35)](https://github.com/saucebase-dev/core)
-[![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php&logoColor=white)](https://php.net)
-
-Works with:<br/>
-[![Vue 3.5](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js&logoColor=white)](https://vuejs.org) [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Saucebase Core](https://img.shields.io/packagist/dependency-v/saucebase/announcements/saucebase%2Fcore?label=Saucebase%20Core&color=FF6B35)](https://github.com/saucebase-dev/core)
+[![License](https://img.shields.io/github/license/saucebase-dev/announcements)](LICENSE)
 
 </div>
 
-Site-wide announcement banners for [Saucebase](https://github.com/saucebase-dev/saucebase), a Laravel SaaS starter kit.
+Site-wide announcement banners for Saucebase, scheduled and targeted.
 
-Write a banner in the admin, choose who sees it and when, and it appears at the top of every page. Visitors can dismiss it and it stays gone.
-
-**[Full documentation →](https://saucebase-dev.github.io/docs/modules/announcements)**
+A module for [Saucebase](https://github.com/saucebase-dev/saucebase), the AI-ready Laravel SaaS kit. Modules are Composer packages you add to a Saucebase app; once installed, the code is yours to change.
 
 ## Features
 
-- **Banner on every page** — sticky at the top, no layout changes needed
-- **Scheduling** — set a start and end date, or leave them open and switch it off by hand
-- **Choose your audience** — show it to visitors, to signed-in users, or both
-- **Dismissable** — visitors can close it, and it stays closed for a year
-- **Rich text** — links and bold text inside the message
-- **Admin panel** — write and manage announcements at `/admin`
-- **Vue and React** — works on both
+- **A banner on every page**, sticky at the top, with no layout changes
+- **Scheduling**: a start and end date, or open-ended
+- **Audience**: visitors, signed-in users, or both
+- **Dismissable**: closed banners stay closed for a year
+- **Rich text**: links and bold text in the message
+- **Admin panel** to write and manage announcements
+- **Vue and React**
 
-## Requirements
+## Install
 
-| | |
-| --- | --- |
-| Saucebase core | `^1.6` |
-| Modules | [Auth](https://github.com/saucebase-dev/auth) |
+**New to Saucebase?** Start a new app and pick **announcements** when it asks for modules:
 
-## Installation
+```bash
+curl -fsSL https://install.saucebase.dev | bash
+```
+
+It installs PHP and Composer if they're missing. With the CLI already installed, run `saucebase new my-app` instead.
+
+**Already have a Saucebase app?** Add it with:
 
 ```bash
 composer require saucebase/announcements
 php artisan migrate
+php artisan modules:seed --module=announcements
 npm run build
 ```
 
-That is it. There is nothing to configure — go to `/admin` → Announcements and write your first one.
+## Configuration
 
-### Sample data (optional)
+Nothing to set up. Write announcements in the admin panel, under **Announcements**.
+
+## Demo data
 
 ```bash
 php artisan modules:seed --module=announcements --demo
 ```
 
-## Writing an announcement
-
-In `/admin` → Announcements, each one has:
-
-- **Text** — your message, with links and formatting
-- **Active** — the on/off switch
-- **Starts at / Ends at** — optional. Leave both empty and it shows until you turn it off
-- **Dismissable** — lets visitors close it
-- **Show on frontend / Show on dashboard** — who sees it. Turn on either, or both
-
-Only one announcement shows at a time — the most recent active one.
-
-## Extending
-
-**Change the look.** The banner is a normal component, `resources/js/components/AnnouncementBanner`. Edit it like any other.
-
-**Change the cookie.** Dismissals are stored in a cookie named `saucebase_announcement_dismissed`. Rename it in `config/announcements.php` if it clashes with something.
-
-Note that dismissals are tied to the announcement's ID. If you want to reach people who dismissed the last one, publish a new announcement rather than editing the old one.
-
-## Configuration
-
-Nothing is required. The only setting is the cookie name above.
-
-See the [documentation](https://saucebase-dev.github.io/docs/modules/announcements) for the rest.
+Adds a sample banner and a staff account (`announcements@saucebase.dev`) that only sees announcements in the admin. It uses the `DEMO_PASSWORD` from `.env`.
 
 ## License
 
-Proprietary. Part of [Saucebase](https://github.com/saucebase-dev/saucebase).
+MIT. See [LICENSE](LICENSE).
