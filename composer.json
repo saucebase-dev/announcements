@@ -1,11 +1,11 @@
 {
   "name": "saucebase/announcements",
-  "description": "Site-wide announcement banners",
+  "description": "Site-wide announcement banners for Saucebase, scheduled and targeted.",
   "type": "saucebase-module",
   "license": "MIT",
   "version": "v3.2.1",
   "require": {
-    "saucebase/core": "^1.6"
+    "saucebase/core": "^1.13"
   },
   "authors": [
     {

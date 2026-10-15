@@ -15,7 +15,7 @@ class DemoAnnouncementsDatabaseSeeder extends Seeder
         Role::findOrCreate('announcements admin')->syncPermissions(['access admin panel', 'manage announcements']);
         $staff = User::firstOrCreate(
             ['email' => 'announcements@saucebase.dev'],
-            ['name' => 'Announcements Admin', 'password' => bcrypt('secretsauce')],
+            ['name' => 'Announcements Admin', 'password' => bcrypt(config('saucebase.demo_password'))],
         );
         $staff->syncRoles('announcements admin');
 
