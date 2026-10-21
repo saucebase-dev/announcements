@@ -85,4 +85,12 @@ class AnnouncementTest extends TestCase
         $this->assertNotNull($result);
         $this->assertEquals($latest->id, $result->id);
     }
+
+    /** Cast, so a database 0/1 never reaches callers as an integer. */
+    public function test_flags_are_booleans(): void
+    {
+        $announcement = Announcement::factory()->create(['is_active' => 1])->fresh();
+
+        $this->assertTrue($announcement->is_active);
+    }
 }
