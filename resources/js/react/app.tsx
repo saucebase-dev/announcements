@@ -3,5 +3,5 @@ import { registerGlobalComponent } from '@saucebase/react/lib/globalComponents';
 import AnnouncementBanner from './components/AnnouncementBanner';
 
 export function setup() {
-    registerGlobalComponent('top', AnnouncementBanner);
+    registerGlobalComponent('app::page.before', AnnouncementBanner);
 }
