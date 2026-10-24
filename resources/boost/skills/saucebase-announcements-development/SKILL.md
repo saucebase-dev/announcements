@@ -17,7 +17,7 @@ Site-wide announcement banners with scheduling, audience targeting, and dismissa
 | Model | `Announcement` (text, is_active, is_dismissable, show_on_frontend, show_on_dashboard, starts_at, ends_at, created_by) |
 | Provider | `AnnouncementsServiceProvider` — extends `ModuleServiceProvider`, shares active announcement as Inertia prop via `shareInertiaData()` |
 | Filament | `AnnouncementsPlugin`, `AnnouncementResource` (List, Create, Edit), `AnnouncementForm`, `AnnouncementsTable` |
-| Component | `AnnouncementBanner` (`resources/js/components/AnnouncementBanner`) — sticky banner registered in the `top` global component slot |
+| Component | `AnnouncementBanner` (`resources/js/components/AnnouncementBanner`) — sticky banner registered in the `app::page.before` global component slot |
 | Types | `resources/js/types/index.ts` — `Announcement` interface |
 
 ## Routes
@@ -60,7 +60,7 @@ Two boolean flags on the model:
 `CreateAnnouncement::mutateFormDataBeforeCreate()` sets `created_by = auth()->id()` automatically.
 
 ### Core Integration
-No patches. The module's `resources/js/app` entry calls `registerGlobalComponent('top', AnnouncementBanner)` in `setup()`, and core renders the `top` slot.
+No patches. The module's `resources/js/app` entry calls `registerGlobalComponent('app::page.before', AnnouncementBanner)` in `setup()`, and core renders that slot.
 
 The `announcement` TypeScript type is handled automatically via `resources/js/types/page-props.d.ts`, which augments `@inertiajs/core`'s `PageProps` — no manual core edit required.
 
@@ -88,7 +88,7 @@ The schedule tests write their window around the real clock. Never use `laravel.
 
 ## Gotchas
 
-- No frontend routes or pages — this module is admin-only; the banner mounts through the `top` global component slot
+- No frontend routes or pages — this module is admin-only; the banner mounts through the `app::page.before` global component slot
 - The banner is removed by the server, not by the click: it disappears when the response comes back without the `announcement` prop. Hiding it locally first raced the request that writes the cookie, so a reload straight after dismissing brought it back
 - Cookie is set for 1 year (60 × 24 × 365 minutes); users (or the app) can clear/overwrite it to re-show the same announcement, but if you want to re-show to users who dismissed it without touching cookies, publish a new announcement (new ID)
 - `show_on_frontend` / `show_on_dashboard` are independent — an announcement can target one or both audiences

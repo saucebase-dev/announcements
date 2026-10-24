@@ -7,5 +7,5 @@ import AnnouncementBanner from './components/AnnouncementBanner.vue';
  * Called during app initialization before mounting
  */
 export function setup() {
-    registerGlobalComponent('top', AnnouncementBanner);
+    registerGlobalComponent('app::page.before', AnnouncementBanner);
 }
