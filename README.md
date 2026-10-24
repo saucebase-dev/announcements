@@ -36,10 +36,8 @@ It installs PHP and Composer if they're missing. With the CLI already installed,
 **Already have a Saucebase app?** Add it with:
 
 ```bash
-composer require saucebase/announcements
-php artisan migrate
-php artisan modules:seed --module=announcements
-npm run build
+php artisan saucebase:module-install announcements
+npm install && npm run build
 ```
 
 ## Configuration
