@@ -3,7 +3,7 @@
   "description": "Site-wide announcement banners for Saucebase, scheduled and targeted.",
   "type": "saucebase-module",
   "license": "MIT",
-  "version": "v3.4.0",
+  "version": "v3.4.1",
   "require": {
     "saucebase/core": "^2.0"
   },
