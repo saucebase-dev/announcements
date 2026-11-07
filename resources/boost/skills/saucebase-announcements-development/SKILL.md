@@ -45,7 +45,7 @@ No frontend pages — admin-only via Filament.
 Only shares: `id`, `text`, `is_dismissable`, `show_on_frontend`, `show_on_dashboard`.
 
 ### Dismissal
-`DismissAnnouncementController` sets a 1-year cookie (`saucebase_announcement_dismissed`) with the announcement ID. The banner component posts to `announcements.dismiss` on click; the provider checks the cookie on subsequent requests.
+`DismissAnnouncementController` answers 404 for an announcement that is not `is_dismissable` (the banner shows no button for it; sc-1134), and otherwise sets a 1-year cookie (`saucebase_announcement_dismissed`) with the announcement ID. The banner component posts to `announcements.dismiss` on click; the provider checks the cookie on subsequent requests.
 
 Cookie name is configurable via `config('announcements.cookie_name')`.
 
