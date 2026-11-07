@@ -143,11 +143,21 @@ class AnnouncementResourceTest extends TestCase
 
     public function test_dismiss_route_sets_announcement_dismissed_cookie(): void
     {
-        $announcement = Announcement::factory()->active()->create();
+        $announcement = Announcement::factory()->active()->dismissable()->create();
         $cookieName = config('announcements.cookie_name');
 
         $response = $this->post(route('announcements.dismiss', $announcement));
 
         $response->assertCookie($cookieName, (string) $announcement->id);
+    }
+
+    /** The banner offers no button for these; a hand-made request must not hide one either. */
+    public function test_an_announcement_that_cannot_be_dismissed_is_not(): void
+    {
+        $announcement = Announcement::factory()->active()->create(['is_dismissable' => false]);
+
+        $this->post(route('announcements.dismiss', $announcement))
+            ->assertNotFound()
+            ->assertCookieMissing(config('announcements.cookie_name'));
     }
 }
