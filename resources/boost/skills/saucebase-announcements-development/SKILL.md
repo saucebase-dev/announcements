@@ -45,7 +45,7 @@ No frontend pages — admin-only via Filament.
 Only shares: `id`, `text`, `is_dismissable`, `show_on_frontend`, `show_on_dashboard`.
 
 ### Dismissal
-`DismissAnnouncementController` sets a 1-year cookie (`saucebase_announcement_dismissed`) with the announcement ID. The banner component posts to `announcements.dismiss` on click; the provider checks the cookie on subsequent requests.
+`DismissAnnouncementController` answers 404 for an announcement that is not `is_dismissable` (the banner shows no button for it; sc-1134), and otherwise sets a 1-year cookie (`saucebase_announcement_dismissed`) with the announcement ID. The banner component posts to `announcements.dismiss` on click; the provider checks the cookie on subsequent requests.
 
 Cookie name is configurable via `config('announcements.cookie_name')`.
 
@@ -88,6 +88,7 @@ The schedule tests write their window around the real clock. Never use `laravel.
 
 ## Gotchas
 
+- `text` is rich-editor HTML the banner renders with `v-html`. The model casts `text` with core's `SanitizedHtml` (`Str::sanitizeHtml()` on read, stored as written), so every read (the shared prop included) is safe markup. Keep it if the prop changes (sc-1131)
 - No frontend routes or pages — this module is admin-only; the banner mounts through the `app::page.before` global component slot
 - The banner is removed by the server, not by the click: it disappears when the response comes back without the `announcement` prop. Hiding it locally first raced the request that writes the cookie, so a reload straight after dismissing brought it back
 - Cookie is set for 1 year (60 × 24 × 365 minutes); users (or the app) can clear/overwrite it to re-show the same announcement, but if you want to re-show to users who dismissed it without touching cookies, publish a new announcement (new ID)
