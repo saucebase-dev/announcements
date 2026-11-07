@@ -8,6 +8,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Modules\Announcements\Models\Announcement;
 
 class AnnouncementForm
 {
@@ -22,6 +23,9 @@ class AnnouncementForm
                         ->schema([
                             RichEditor::make('text')
                                 ->hiddenLabel()
+                                // What is stored, not the sanitised read: the sanitiser cuts input
+                                // at 500,000 bytes, and saving any field would write the cut copy back.
+                                ->formatStateUsing(fn (?Announcement $record, mixed $state): mixed => $record?->getRawOriginal('text') ?? $state)
                                 ->required()
                                 ->toolbarButtons([
                                     ['bold', 'italic', 'underline', 'strike'],
