@@ -4,6 +4,7 @@ namespace Modules\Announcements\Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Livewire\Livewire;
@@ -159,5 +160,23 @@ class AnnouncementResourceTest extends TestCase
         $this->post(route('announcements.dismiss', $announcement))
             ->assertNotFound()
             ->assertCookieMissing(config('announcements.cookie_name'));
+    }
+
+    /** The sanitiser cuts input at 500,000 bytes: saving another field must not write the cut copy back. */
+    public function test_saving_another_field_keeps_long_text_whole(): void
+    {
+        $text = str_repeat('<p>Long announcement.</p>', 25_000);
+        $announcement = Announcement::factory()->create(['text' => $text]);
+        $this->assertGreaterThan(500_000, strlen($text));
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(EditAnnouncement::class, ['record' => $announcement->id])
+            ->fillForm(['is_active' => true])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $stored = (string) DB::table('announcements')->where('id', $announcement->id)->value('text');
+        $this->assertSame(strlen($text), strlen($stored), 'the stored text was cut');
     }
 }
