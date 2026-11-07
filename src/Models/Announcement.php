@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Saucebase\Core\Casts\SanitizedHtml;
 
 /**
  * @property int $id
@@ -46,6 +47,8 @@ class Announcement extends Model
             'show_on_dashboard' => 'boolean',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            // The banner renders it as markup on every page.
+            'text' => SanitizedHtml::class,
         ];
     }
 

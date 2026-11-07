@@ -10,6 +10,20 @@ class AnnouncementTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** The banner renders the text as HTML on every page, so markup that runs is stripped. */
+    public function test_text_is_sanitised_for_rendering(): void
+    {
+        $announcement = Announcement::factory()->create([
+            'text' => '<p><strong>Sale</strong><img src=x onerror="alert(1)"><script>alert(2)</script></p>',
+        ]);
+
+        $text = $announcement->fresh()->text;
+
+        $this->assertStringContainsString('<strong>Sale</strong>', $text);
+        $this->assertStringNotContainsString('onerror', $text);
+        $this->assertStringNotContainsString('<script', $text);
+    }
+
     public function test_returns_null_when_no_announcements_exist(): void
     {
         $result = Announcement::active()->first();
