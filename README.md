@@ -47,7 +47,7 @@ Nothing to set up. Write announcements in the admin panel, under **Announcements
 ## Demo data
 
 ```bash
-php artisan modules:seed --module=announcements --demo
+php artisan modules:seed --module=announcements --state=showcase
 ```
 
 Adds a sample banner and a staff account (`announcements@saucebase.dev`) that only sees announcements in the admin. It uses the `DEMO_PASSWORD` from `.env`.
