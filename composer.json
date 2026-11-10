@@ -25,6 +25,9 @@
         "Modules\\Announcements\\Providers\\AnnouncementsServiceProvider"
       ],
       "aliases": {}
+    },
+    "branch-alias": {
+      "dev-dev": "3.5.x-dev"
     }
   },
   "autoload": {
