@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use Modules\Announcements\Models\Announcement;
 use Spatie\Permission\Models\Role;
 
-class DemoAnnouncementsDatabaseSeeder extends Seeder
+class ShowcaseAnnouncementsDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
