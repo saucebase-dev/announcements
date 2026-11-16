@@ -5,8 +5,10 @@ namespace Modules\Announcements\Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Modules\Announcements\Models\Announcement;
+use Saucebase\Core\Attributes\DemoAccount;
 use Spatie\Permission\Models\Role;
 
+#[DemoAccount('announcements@saucebase.dev', 'staff: the announcements admin')]
 class ShowcaseAnnouncementsDatabaseSeeder extends Seeder
 {
     public function run(): void
