@@ -135,6 +135,21 @@ class AnnouncementResourceTest extends TestCase
         });
     }
 
+    /** The newest one for this audience: a newer one for the other audience must not hide it. */
+    public function test_the_shared_announcement_is_the_newest_for_the_visitors_audience(): void
+    {
+        $dashboard = Announcement::factory()->active()->create(['show_on_frontend' => false, 'created_at' => now()->subDay()]);
+        $frontend = Announcement::factory()->active()->create(['show_on_dashboard' => false, 'created_at' => now()]);
+
+        $this->actingAs($this->admin)->get($this->inertiaRoute())
+            ->assertInertia(fn ($page) => $page->where('announcement.id', $dashboard->id));
+
+        auth()->logout();
+
+        $this->get($this->inertiaRoute())
+            ->assertInertia(fn ($page) => $page->where('announcement.id', $frontend->id));
+    }
+
     public function test_inactive_announcement_is_not_shared(): void
     {
         Announcement::factory()->create(['is_active' => false]);
