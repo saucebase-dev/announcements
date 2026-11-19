@@ -54,7 +54,7 @@ Two boolean flags on the model:
 - `show_on_frontend` — show on public (unauthenticated) pages
 - `show_on_dashboard` — show on authenticated pages
 
-`AnnouncementBanner` checks the authenticated state and the appropriate flag before rendering.
+The provider shares the newest active announcement for the visitor's audience (signed in: `show_on_dashboard`, else `show_on_frontend`), so a newer one for the other audience never hides it. `AnnouncementBanner` still checks the same flag before rendering.
 
 ### Creator Tracking
 `CreateAnnouncement::mutateFormDataBeforeCreate()` sets `created_by = auth()->id()` automatically.

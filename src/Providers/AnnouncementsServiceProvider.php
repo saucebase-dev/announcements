@@ -13,7 +13,10 @@ class AnnouncementsServiceProvider extends ModuleServiceProvider
         Inertia::share('announcement', function () {
             $cookieName = config('announcements.cookie_name');
             $dismissedId = request()->cookie($cookieName);
-            $announcement = Announcement::active()->first();
+            // The newest for this visitor's audience, as the banner reads it (signed in: dashboard),
+            // so a newer one for the other audience never hides it.
+            $audience = auth()->check() ? 'show_on_dashboard' : 'show_on_frontend';
+            $announcement = Announcement::active()->where($audience, true)->first();
 
             if (! $announcement) {
                 return null;
