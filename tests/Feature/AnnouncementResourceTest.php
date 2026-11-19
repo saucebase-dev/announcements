@@ -38,6 +38,23 @@ class AnnouncementResourceTest extends TestCase
             ->assertCanSeeTableRecords([$announcement]);
     }
 
+    /** A window that ends before it starts would never show: refused, not saved. */
+    public function test_an_end_before_the_start_is_refused(): void
+    {
+        $this->actingAs($this->admin);
+
+        Livewire::test(CreateAnnouncement::class)
+            ->fillForm([
+                'text' => 'Backwards',
+                'starts_at' => '2027-03-10 12:00:00',
+                'ends_at' => '2027-03-01 12:00:00',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['ends_at']);
+
+        $this->assertDatabaseCount('announcements', 0);
+    }
+
     public function test_can_create_announcement_and_auto_sets_created_by(): void
     {
         $this->actingAs($this->admin);
