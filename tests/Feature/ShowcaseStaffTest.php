@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Modules\Announcements\Database\Seeders\DatabaseSeeder;
 use Modules\Announcements\Database\Seeders\ShowcaseAnnouncementsDatabaseSeeder;
+use Saucebase\Core\Testing\AssertsDemoAccounts;
 use Tests\TestCase;
 
 /**
@@ -15,6 +16,7 @@ use Tests\TestCase;
  */
 class ShowcaseStaffTest extends TestCase
 {
+    use AssertsDemoAccounts;
     use RefreshDatabase;
 
     public function test_the_demo_adds_a_staff_account_for_this_module_only(): void
@@ -34,5 +36,11 @@ class ShowcaseStaffTest extends TestCase
         $this->seed([DatabaseSeeder::class, ShowcaseAnnouncementsDatabaseSeeder::class]);
 
         $this->assertTrue(Hash::check('not-the-old-default', User::where('email', 'announcements@saucebase.dev')->value('password')));
+    }
+
+    /** The accounts the seeder declares (#[DemoAccount]) are the ones it creates. */
+    public function test_every_declared_demo_account_is_created(): void
+    {
+        $this->assertDemoAccountsSeeded(ShowcaseAnnouncementsDatabaseSeeder::class);
     }
 }

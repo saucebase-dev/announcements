@@ -38,6 +38,23 @@ class AnnouncementResourceTest extends TestCase
             ->assertCanSeeTableRecords([$announcement]);
     }
 
+    /** A window that ends before it starts would never show: refused, not saved. */
+    public function test_an_end_before_the_start_is_refused(): void
+    {
+        $this->actingAs($this->admin);
+
+        Livewire::test(CreateAnnouncement::class)
+            ->fillForm([
+                'text' => 'Backwards',
+                'starts_at' => '2027-03-10 12:00:00',
+                'ends_at' => '2027-03-01 12:00:00',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['ends_at']);
+
+        $this->assertDatabaseCount('announcements', 0);
+    }
+
     public function test_can_create_announcement_and_auto_sets_created_by(): void
     {
         $this->actingAs($this->admin);
@@ -116,6 +133,21 @@ class AnnouncementResourceTest extends TestCase
             $page->has('announcement')
                 ->where('announcement.id', $announcement->id);
         });
+    }
+
+    /** The newest one for this audience: a newer one for the other audience must not hide it. */
+    public function test_the_shared_announcement_is_the_newest_for_the_visitors_audience(): void
+    {
+        $dashboard = Announcement::factory()->active()->create(['show_on_frontend' => false, 'created_at' => now()->subDay()]);
+        $frontend = Announcement::factory()->active()->create(['show_on_dashboard' => false, 'created_at' => now()]);
+
+        $this->actingAs($this->admin)->get($this->inertiaRoute())
+            ->assertInertia(fn ($page) => $page->where('announcement.id', $dashboard->id));
+
+        auth()->logout();
+
+        $this->get($this->inertiaRoute())
+            ->assertInertia(fn ($page) => $page->where('announcement.id', $frontend->id));
     }
 
     public function test_inactive_announcement_is_not_shared(): void

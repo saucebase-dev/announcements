@@ -57,7 +57,8 @@ class AnnouncementForm
                             DateTimePicker::make('ends_at')
                                 ->label(__('Ends'))
                                 ->nullable()
-                                ->rules(['nullable', 'after_or_equal:starts_at']),
+                                // Filament's rule names the sibling by its state path; a raw 'after_or_equal:starts_at' never finds it.
+                                ->afterOrEqual('starts_at'),
                         ]),
 
                     Section::make(__('Audience'))
