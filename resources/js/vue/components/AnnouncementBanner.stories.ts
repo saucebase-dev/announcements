@@ -1,6 +1,6 @@
 import { user } from '@/.storybook/page';
 import preview from '@/.storybook/preview';
-import { expect, waitFor } from 'storybook/test';
+import { expect } from 'storybook/test';
 import type { Announcement } from '../../types';
 import AnnouncementBanner from './AnnouncementBanner.vue';
 
@@ -40,16 +40,19 @@ export const Visitor = meta.story({
     },
 });
 
-/** Dismissing hides it at once and tells the server, which stops sharing it. */
+/**
+ * Dismissing tells the server, and the banner goes when the next page comes back without
+ * it. Here there is no server: the visit shows in the Actions panel and the banner stays.
+ */
 export const Dismissing = meta.story({
-    play: async ({ canvas, canvasElement, userEvent }) => {
+    play: async ({ canvas, userEvent }) => {
         await userEvent.click(canvas.getByTestId('announcement-dismiss'));
+        // Outlast the 300ms leave transition: a banner on its way out is still in the DOM.
+        await new Promise((resolve) => setTimeout(resolve, 400));
 
-        await waitFor(() =>
-            expect(
-                canvasElement.querySelector('[data-announcement-banner]'),
-            ).toBeNull(),
-        );
+        await expect(
+            canvas.getByRole('link', { name: 'Status page' }),
+        ).toBeVisible();
     },
 });
 

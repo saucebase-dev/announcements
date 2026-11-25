@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router, usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import IconXMark from '~icons/heroicons/x-mark';
 import type { Announcement } from '../../types';
 
@@ -10,13 +10,8 @@ const announcement = computed(
     () => (page.props?.announcement as Announcement) ?? null,
 );
 const isAuthenticated = computed(() => !!page.props?.auth?.user);
-const isDismissed = ref(false);
 
 const isVisible = computed(() => {
-    if (isDismissed.value) {
-        return false;
-    }
-
     if (!announcement.value) {
         return false;
     }
@@ -32,12 +27,17 @@ const isVisible = computed(() => {
     return true;
 });
 
+/**
+ * The banner goes when the server says so, not on the click.
+ *
+ * Hiding it locally first raced the request that stores the cookie: a
+ * reload right after the click brought the banner back, because nothing
+ * had been written yet.
+ */
 function dismiss() {
     if (!announcement.value) {
         return;
     }
-
-    isDismissed.value = true;
 
     router.post(
         route('announcements.dismiss', { announcement: announcement.value.id }),
