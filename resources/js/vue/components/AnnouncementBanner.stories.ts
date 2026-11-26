@@ -1,6 +1,5 @@
-import { user } from '@/.storybook/page';
 import preview from '@/.storybook/preview';
-import { expect } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
 import type { Announcement } from '../../types';
 import AnnouncementBanner from './AnnouncementBanner.vue';
 
@@ -13,26 +12,22 @@ const announcement: Announcement = {
 };
 
 /**
- * The site-wide announcement, across the top of the page. The server shares the active
- * one as the `announcement` page prop; each one chooses whether visitors, signed-in
- * users, or both see it, and whether it can be dismissed.
+ * The site-wide announcement, across the top of the page. The text is HTML from the
+ * admin panel: bold and links render.
  *
- * The text is HTML from the admin panel: bold and links render.
+ * `AnnouncementBannerSlot` puts it on every page: it picks the active announcement for
+ * the visitor's audience and tells the server when one is dismissed.
  */
 const meta = preview.meta({
     title: 'Announcements/AnnouncementBanner',
     component: AnnouncementBanner,
-    parameters: {
-        // Its stories differ only in page props, which one docs page shares.
-        docs: { story: { inline: false, iframeHeight: '120px' } },
-        layout: 'fullscreen',
-        inertia: { announcement },
-    },
+    args: { announcement, onDismiss: fn() },
+    parameters: { layout: 'fullscreen' },
 });
 export default meta;
 
-/** A visitor on the public site. Bold text and links come from the admin's editor. */
-export const Visitor = meta.story({
+/** Bold text and a link, from the admin's editor. */
+export const Default = meta.story({
     play: async ({ canvas }) => {
         await expect(
             canvas.getByRole('link', { name: 'Status page' }),
@@ -40,45 +35,31 @@ export const Visitor = meta.story({
     },
 });
 
-/**
- * Dismissing tells the server, and the banner goes when the next page comes back without
- * it. Here there is no server: the visit shows in the Actions panel and the banner stays.
- */
+/** The close button asks for the announcement to go; the banner doesn't hide itself. */
 export const Dismissing = meta.story({
-    play: async ({ canvas, userEvent }) => {
-        await userEvent.click(canvas.getByTestId('announcement-dismiss'));
-        // Outlast the 300ms leave transition: a banner on its way out is still in the DOM.
-        await new Promise((resolve) => setTimeout(resolve, 400));
+    play: async ({ args, canvas, userEvent }) => {
+        await userEvent.click(
+            canvas.getByRole('button', { name: 'Dismiss announcement' }),
+        );
 
-        await expect(
-            canvas.getByRole('link', { name: 'Status page' }),
-        ).toBeVisible();
+        await expect(args.onDismiss).toHaveBeenCalledWith(announcement);
     },
-});
-
-/** A signed-in user, on the dashboard. */
-export const SignedIn = meta.story({
-    parameters: { inertia: { auth: { user } } },
 });
 
 /** One that can't be dismissed: no close button. */
 export const NotDismissable = meta.story({
-    parameters: {
-        inertia: { announcement: { ...announcement, is_dismissable: false } },
-    },
+    args: { announcement: { ...announcement, is_dismissable: false } },
     play: async ({ canvas }) => {
-        await expect(canvas.queryByTestId('announcement-dismiss')).toBeNull();
+        await expect(canvas.queryByRole('button')).toBeNull();
     },
 });
 
-/** Dashboard-only, seen by a visitor: nothing renders. */
-export const HiddenFromVisitors = meta.story({
-    parameters: {
-        inertia: { announcement: { ...announcement, show_on_frontend: false } },
-    },
-    play: async ({ canvasElement }) => {
-        await expect(
-            canvasElement.querySelector('[data-announcement-banner]'),
-        ).toBeNull();
+/** A long text stops at two lines. */
+export const LongText = meta.story({
+    args: {
+        announcement: {
+            ...announcement,
+            text: 'We are moving to a new data centre this weekend. '.repeat(8),
+        },
     },
 });

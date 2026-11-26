@@ -1,7 +1,7 @@
 import '@modules/announcements/resources/css/style.css';
 import { registerGlobalComponent } from '@saucebase/react/lib/globalComponents';
-import AnnouncementBanner from './components/AnnouncementBanner';
+import { AnnouncementBannerSlot } from './components/AnnouncementBannerSlot';
 
 export function setup() {
-    registerGlobalComponent('app::page.before', AnnouncementBanner);
+    registerGlobalComponent('app::page.before', AnnouncementBannerSlot);
 }

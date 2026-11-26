@@ -1,40 +1,17 @@
-import { router, usePage } from '@inertiajs/react';
 import { useT } from '@saucebase/react/i18n';
 import IconXMark from '~icons/heroicons/x-mark';
 import type { Announcement } from '../../types';
 
-export default function AnnouncementBanner() {
-    const page = usePage();
+type Props = {
+    /** The text is HTML from the admin's editor, sanitised by the server. */
+    announcement: Announcement;
+    /** The close button: whoever shows the banner decides when it goes. */
+    onDismiss?: (announcement: Announcement) => void;
+};
+
+/** The site-wide announcement, across the top of the page. */
+export function AnnouncementBanner({ announcement, onDismiss }: Props) {
     const t = useT();
-    const announcement = (page.props?.announcement as Announcement) ?? null;
-    const isAuthenticated = !!page.props?.auth?.user;
-
-    if (!announcement) {
-        return null;
-    }
-
-    const audienceAllowed = isAuthenticated
-        ? announcement.show_on_dashboard
-        : announcement.show_on_frontend;
-
-    if (!audienceAllowed) {
-        return null;
-    }
-
-    /**
-     * The banner goes when the server says so, not on the click.
-     *
-     * Hiding it locally first raced the request that stores the cookie: a
-     * reload right after the click brought the banner back, because nothing
-     * had been written yet.
-     */
-    function dismiss() {
-        router.post(
-            route('announcements.dismiss', { announcement: announcement.id }),
-            {},
-            { preserveScroll: true },
-        );
-    }
 
     return (
         <div
@@ -54,7 +31,7 @@ export default function AnnouncementBanner() {
                     className="absolute top-1/2 right-4 -translate-y-1/2 p-1.5 text-white opacity-80 transition hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                     data-testid="announcement-dismiss"
                     aria-label={t('Dismiss announcement')}
-                    onClick={dismiss}
+                    onClick={() => onDismiss?.(announcement)}
                 >
                     <IconXMark className="size-5" aria-hidden="true" />
                 </button>
