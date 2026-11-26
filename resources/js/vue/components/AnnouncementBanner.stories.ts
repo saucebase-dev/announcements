@@ -1,38 +1,67 @@
-import { user } from '@/.storybook/page';
 import preview from '@/.storybook/preview';
+import type { Decorator } from '@storybook/vue3-vite';
+import { action } from 'storybook/actions';
+import { useArgs } from 'storybook/preview-api';
 import { expect, waitFor } from 'storybook/test';
-import type { Announcement } from '../../types';
 import AnnouncementBanner from './AnnouncementBanner.vue';
 
-const announcement: Announcement = {
-    id: 1,
-    text: 'Scheduled maintenance on <strong>Sunday, 02:00 UTC</strong>. <a href="/status">Status page</a>',
-    is_dismissable: true,
-    show_on_frontend: true,
-    show_on_dashboard: true,
+// Stands in for the slot: dismissing closes it, as the next page would. The handler is
+// the decorator's, not an arg, so the docs can print the snippet.
+const closeOnDismiss: Decorator = (story, { args }) => {
+    const [, updateArgs] = useArgs();
+
+    return story({
+        args: {
+            onDismiss: () => {
+                action('dismiss')();
+                args.open = false;
+                updateArgs({ open: false });
+            },
+        },
+    });
 };
 
 /**
- * The site-wide announcement, across the top of the page. The server shares the active
- * one as the `announcement` page prop; each one chooses whether visitors, signed-in
- * users, or both see it, and whether it can be dismissed.
+ * The site-wide announcement, stuck to the top of the page. The text is HTML from the
+ * admin panel: bold and links render.
  *
- * The text is HTML from the admin panel: bold and links render.
+ * `AnnouncementBannerSlot` puts it on every page: it picks the active announcement for
+ * the visitor's audience, tells the server when one is dismissed, and closes the banner
+ * when the next page comes back without it. Here, dismissing closes it at once and logs
+ * `dismiss` in Actions; turn `open` back on in Controls to bring it back.
  */
 const meta = preview.meta({
     title: 'Announcements/AnnouncementBanner',
     component: AnnouncementBanner,
-    parameters: {
-        // Its stories differ only in page props, which one docs page shares.
-        docs: { story: { inline: false, iframeHeight: '120px' } },
-        layout: 'fullscreen',
-        inertia: { announcement },
+    args: {
+        text: 'Scheduled maintenance on <strong>Sunday, 02:00 UTC</strong>. <a href="#">Status page</a>',
+        dismissable: true,
+        open: true,
     },
+    parameters: { layout: 'fullscreen' },
+    decorators: [
+        closeOnDismiss,
+        // A page under it, in a box of its own that scrolls, so its place at the top can
+        // be seen inline on the docs page too.
+        () => ({
+            template: `
+                <div data-page class="h-80 overflow-y-auto">
+                    <story />
+                    <main class="mx-auto max-w-7xl space-y-6 px-6 py-12">
+                        <div class="bg-muted h-48 rounded-xl" />
+                        <div class="grid gap-6 sm:grid-cols-3">
+                            <div v-for="n in 3" :key="n" class="bg-muted h-40 rounded-xl" />
+                        </div>
+                        <div class="bg-muted h-96 rounded-xl" />
+                    </main>
+                </div>`,
+        }),
+    ],
 });
 export default meta;
 
-/** A visitor on the public site. Bold text and links come from the admin's editor. */
-export const Visitor = meta.story({
+/** Bold text and a link, from the admin's editor. */
+export const Default = meta.story({
     play: async ({ canvas }) => {
         await expect(
             canvas.getByRole('link', { name: 'Status page' }),
@@ -40,10 +69,29 @@ export const Visitor = meta.story({
     },
 });
 
-/** Dismissing hides it at once and tells the server, which stops sharing it. */
+/** It stays at the top while the page scrolls under it. */
+export const Scrolling = meta.story({
+    play: async ({ canvasElement }) => {
+        const page = canvasElement.querySelector('[data-page]')!;
+        page.scrollTo({ top: 600, behavior: 'instant' });
+
+        const banner = canvasElement.querySelector(
+            '[data-announcement-banner]',
+        );
+        await waitFor(() =>
+            expect(banner?.getBoundingClientRect().top).toBe(
+                page.getBoundingClientRect().top,
+            ),
+        );
+    },
+});
+
+/** The close button: the banner slides away. Turn `open` back on to bring it back. */
 export const Dismissing = meta.story({
     play: async ({ canvas, canvasElement, userEvent }) => {
-        await userEvent.click(canvas.getByTestId('announcement-dismiss'));
+        await userEvent.click(
+            canvas.getByRole('button', { name: 'Dismiss announcement' }),
+        );
 
         await waitFor(() =>
             expect(
@@ -53,29 +101,27 @@ export const Dismissing = meta.story({
     },
 });
 
-/** A signed-in user, on the dashboard. */
-export const SignedIn = meta.story({
-    parameters: { inertia: { auth: { user } } },
-});
-
-/** One that can't be dismissed: no close button. */
-export const NotDismissable = meta.story({
-    parameters: {
-        inertia: { announcement: { ...announcement, is_dismissable: false } },
-    },
-    play: async ({ canvas }) => {
-        await expect(canvas.queryByTestId('announcement-dismiss')).toBeNull();
-    },
-});
-
-/** Dashboard-only, seen by a visitor: nothing renders. */
-export const HiddenFromVisitors = meta.story({
-    parameters: {
-        inertia: { announcement: { ...announcement, show_on_frontend: false } },
-    },
+/** Closed: nothing shows. Turning `open` on slides it in. */
+export const Closed = meta.story({
+    args: { open: false },
     play: async ({ canvasElement }) => {
         await expect(
             canvasElement.querySelector('[data-announcement-banner]'),
         ).toBeNull();
+    },
+});
+
+/** One the admin made permanent: no close button. */
+export const NotDismissable = meta.story({
+    args: { dismissable: false },
+    play: async ({ canvas }) => {
+        await expect(canvas.queryByRole('button')).toBeNull();
+    },
+});
+
+/** A long text stops at two lines. */
+export const LongText = meta.story({
+    args: {
+        text: 'We are moving to a new data centre this weekend. '.repeat(8),
     },
 });
