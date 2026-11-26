@@ -1,8 +1,25 @@
 import preview from '@/.storybook/preview';
+import type { Decorator } from '@storybook/vue3-vite';
 import { action } from 'storybook/actions';
 import { useArgs } from 'storybook/preview-api';
 import { expect, waitFor } from 'storybook/test';
 import AnnouncementBanner from './AnnouncementBanner.vue';
+
+// Stands in for the slot: dismissing closes it, as the next page would. The handler is
+// the decorator's, not an arg, so the docs can print the snippet.
+const closeOnDismiss: Decorator = (story, { args }) => {
+    const [, updateArgs] = useArgs();
+
+    return story({
+        args: {
+            onDismiss: () => {
+                action('dismiss')();
+                args.open = false;
+                updateArgs({ open: false });
+            },
+        },
+    });
+};
 
 /**
  * The site-wide announcement, stuck to the top of the page. The text is HTML from the
@@ -23,21 +40,7 @@ const meta = preview.meta({
     },
     parameters: { layout: 'fullscreen' },
     decorators: [
-        // Stands in for the slot: dismissing closes it, as the next page would. The
-        // handler is the decorator's, not an arg, so the docs can print the snippet.
-        (story, { args }) => {
-            const [, updateArgs] = useArgs();
-
-            return story({
-                args: {
-                    onDismiss: () => {
-                        action('dismiss')();
-                        args.open = false;
-                        updateArgs({ open: false });
-                    },
-                },
-            });
-        },
+        closeOnDismiss,
         // A page under it, in a box of its own that scrolls, so its place at the top can
         // be seen inline on the docs page too.
         () => ({
