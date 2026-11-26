@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import type { Announcement } from '../../types';
 import AnnouncementBanner from './AnnouncementBanner.vue';
 
@@ -19,13 +19,25 @@ const announcement = computed(() => {
     return audience ? shared : null;
 });
 
+// The last one shown, so the banner keeps its text while it slides away.
+const shown = ref<Announcement | null>(null);
+watchEffect(() => {
+    if (announcement.value) {
+        shown.value = announcement.value;
+    }
+});
+
 /**
  * The banner goes when the server says so, not on the click: hiding it first raced
  * the request that stores the cookie, and a reload straight after brought it back.
  */
-function dismiss(announcement: Announcement) {
+function dismiss() {
+    if (!shown.value) {
+        return;
+    }
+
     router.post(
-        route('announcements.dismiss', { announcement: announcement.id }),
+        route('announcements.dismiss', { announcement: shown.value.id }),
         {},
         { preserveScroll: true },
     );
@@ -33,14 +45,11 @@ function dismiss(announcement: Announcement) {
 </script>
 
 <template>
-    <Transition
-        leave-active-class="transition-all duration-300 ease-in"
-        leave-to-class="opacity-0 -translate-y-full"
-    >
-        <AnnouncementBanner
-            v-if="announcement"
-            :announcement="announcement"
-            @dismiss="dismiss"
-        />
-    </Transition>
+    <AnnouncementBanner
+        v-if="shown"
+        :text="shown.text"
+        :dismissable="shown.is_dismissable"
+        :open="announcement !== null"
+        @dismiss="dismiss"
+    />
 </template>

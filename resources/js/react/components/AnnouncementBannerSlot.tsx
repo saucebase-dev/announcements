@@ -1,4 +1,5 @@
 import { router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import type { Announcement } from '../../types';
 import { AnnouncementBanner } from './AnnouncementBanner';
 
@@ -8,20 +9,28 @@ import { AnnouncementBanner } from './AnnouncementBanner';
  */
 export function AnnouncementBannerSlot() {
     const page = usePage();
-    const announcement = (page.props.announcement as Announcement | null) ?? null;
+    const shared = (page.props.announcement as Announcement | null) ?? null;
     const audience = page.props.auth?.user
-        ? announcement?.show_on_dashboard
-        : announcement?.show_on_frontend;
+        ? shared?.show_on_dashboard
+        : shared?.show_on_frontend;
+    const announcement = audience ? shared : null;
 
-    if (!announcement || !audience) {
+    // The last one shown, so the banner keeps its text while it slides away.
+    const [shown, setShown] = useState(announcement);
+    if (announcement && announcement !== shown) {
+        setShown(announcement);
+    }
+
+    if (!shown) {
         return null;
     }
+    const { id } = shown;
 
     /**
      * The banner goes when the server says so, not on the click: hiding it first raced
      * the request that stores the cookie, and a reload straight after brought it back.
      */
-    function dismiss({ id }: Announcement) {
+    function dismiss() {
         router.post(
             route('announcements.dismiss', { announcement: id }),
             {},
@@ -29,5 +38,12 @@ export function AnnouncementBannerSlot() {
         );
     }
 
-    return <AnnouncementBanner announcement={announcement} onDismiss={dismiss} />;
+    return (
+        <AnnouncementBanner
+            text={shown.text}
+            dismissable={shown.is_dismissable}
+            open={announcement !== null}
+            onDismiss={dismiss}
+        />
+    );
 }

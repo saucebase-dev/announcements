@@ -17,7 +17,7 @@ Site-wide announcement banners with scheduling, audience targeting, and dismissa
 | Model | `Announcement` (text, is_active, is_dismissable, show_on_frontend, show_on_dashboard, starts_at, ends_at, created_by) |
 | Provider | `AnnouncementsServiceProvider` — extends `ModuleServiceProvider`, shares active announcement as Inertia prop via `shareInertiaData()` |
 | Filament | `AnnouncementsPlugin`, `AnnouncementResource` (List, Create, Edit), `AnnouncementForm`, `AnnouncementsTable` |
-| Components | `AnnouncementBanner` (`resources/js/{vue,react}/components/`) — the sticky banner from props (`announcement`, `dismiss` event), with stories. `AnnouncementBannerSlot` — reads the page, picks the audience, posts the dismissal; registered in the `app::page.before` slot, covered by E2E |
+| Components | `AnnouncementBanner` (`resources/js/{vue,react}/components/`) — the sticky banner from props (`text`, `dismissable`, `open`; `dismiss` event), sliding in and out as `open` changes, with stories. `AnnouncementBannerSlot` — reads the page, picks the audience, posts the dismissal, and closes the banner when the next page drops the prop; registered in the `app::page.before` slot, covered by E2E |
 | Types | `resources/js/types/index.ts` — `Announcement` interface |
 
 ## Routes
