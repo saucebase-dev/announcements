@@ -1,7 +1,6 @@
 import preview from '@/.storybook/preview';
 import { useArgs } from 'storybook/preview-api';
 import { expect, fn, waitFor } from 'storybook/test';
-import { ref, watch } from 'vue';
 import AnnouncementBanner from './AnnouncementBanner.vue';
 
 /**
@@ -24,35 +23,38 @@ const meta = preview.meta({
     },
     parameters: {
         layout: 'fullscreen',
-        // Each story scrolls its own page.
-        docs: { story: { inline: false, iframeHeight: '320px' } },
+        docs: {
+            // Each story scrolls its own page.
+            story: { inline: false, iframeHeight: '320px' },
+        },
     },
-    // Stands in for the slot: dismissing closes it, as the next page would.
-    render: (args) => {
-        const [, updateArgs] = useArgs();
-
-        return {
-            components: { AnnouncementBanner },
-            setup() {
-                // Its own state, so the banner animates away before Controls re-render it.
-                const open = ref(args.open);
-                watch(
-                    () => args.open,
-                    (value) => (open.value = value),
-                );
-                const close = () => {
-                    open.value = false;
-                    updateArgs({ open: false });
-                };
-
-                return { args, open, close };
-            },
-            template:
-                '<AnnouncementBanner v-bind="args" :open="open" @dismiss="close" />',
-        };
-    },
-    // A page under it, tall enough to scroll, so its place at the top can be seen.
     decorators: [
+        // Stands in for the slot: dismissing closes it, as the next page would.
+        (story, { parameters }) => {
+            const [, updateArgs] = useArgs();
+            if (parameters.closeOnDismiss === false) {
+                return story();
+            }
+
+            return {
+                setup: () => ({
+                    close(event: MouseEvent) {
+                        const target = event.target as HTMLElement;
+                        if (
+                            target.closest(
+                                '[data-testid="announcement-dismiss"]',
+                            )
+                        ) {
+                            updateArgs({ open: false });
+                        }
+                    },
+                }),
+                // `contents`: no box of its own, so the banner still sticks to the page.
+                template:
+                    '<div class="contents" @click="close"><story /></div>',
+            };
+        },
+        // A page under it, tall enough to scroll, so its place at the top can be seen.
         () => ({
             template: `
                 <story />
@@ -92,20 +94,27 @@ export const Scrolling = meta.story({
 });
 
 /**
- * The close button asks for it to go, and it slides away. The story closes it only from
- * the `dismiss` event (logged in Actions), so the banner leaving shows the event fired.
+ * The close button asks for it to go. This story keeps it open: closing re-renders the
+ * story, which would reset the spy the test reads. The other stories close it.
  */
 export const Dismissing = meta.story({
-    play: async ({ canvas, canvasElement, userEvent }) => {
+    parameters: { closeOnDismiss: false },
+    play: async ({ args, canvas, userEvent }) => {
         await userEvent.click(
             canvas.getByRole('button', { name: 'Dismiss announcement' }),
         );
 
-        await waitFor(() =>
-            expect(
-                canvasElement.querySelector('[data-announcement-banner]'),
-            ).toBeNull(),
-        );
+        await expect(args.onDismiss).toHaveBeenCalled();
+    },
+});
+
+/** Closed: nothing shows. Turning `open` on slides it in. */
+export const Closed = meta.story({
+    args: { open: false },
+    play: async ({ canvasElement }) => {
+        await expect(
+            canvasElement.querySelector('[data-announcement-banner]'),
+        ).toBeNull();
     },
 });
 
