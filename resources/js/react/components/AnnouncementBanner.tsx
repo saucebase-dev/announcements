@@ -42,9 +42,9 @@ export function AnnouncementBanner({
             return;
         }
         let reopenedFirst = false;
-        Promise.all(element.getAnimations().map((a) => a.finished)).then(
+        // Settled, not fulfilled: a slide cut short rejects, and the banner still goes.
+        Promise.allSettled(element.getAnimations().map((a) => a.finished)).then(
             () => !reopenedFirst && setPresent(false),
-            () => {},
         );
 
         return () => {

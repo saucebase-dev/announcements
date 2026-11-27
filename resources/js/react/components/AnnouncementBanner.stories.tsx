@@ -135,6 +135,29 @@ export const Dismissing = meta.story({
     },
 });
 
+/** A slide cut short, by a style change mid-close, still takes the banner away (sc-1262). */
+export const DismissingInterrupted = meta.story({
+    play: async ({ canvas, canvasElement, userEvent }) => {
+        await userEvent.click(
+            canvas.getByRole('button', { name: 'Dismiss announcement' }),
+        );
+
+        const banner = canvasElement.querySelector(
+            '[data-announcement-banner]',
+        )!;
+        await waitFor(() =>
+            expect(banner.getAnimations().length).toBeGreaterThan(0),
+        );
+        banner.getAnimations()[0].cancel();
+
+        await waitFor(() =>
+            expect(
+                canvasElement.querySelector('[data-announcement-banner]'),
+            ).toBeNull(),
+        );
+    },
+});
+
 /** Closed: nothing shows. Turning `open` on slides it in. */
 export const Closed = meta.story({
     args: { open: false },
