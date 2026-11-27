@@ -17,7 +17,7 @@ Site-wide announcement banners with scheduling, audience targeting, and dismissa
 | Model | `Announcement` (text, is_active, is_dismissable, show_on_frontend, show_on_dashboard, starts_at, ends_at, created_by) |
 | Provider | `AnnouncementsServiceProvider` — extends `ModuleServiceProvider`, shares active announcement as Inertia prop via `shareInertiaData()` |
 | Filament | `AnnouncementsPlugin`, `AnnouncementResource` (List, Create, Edit), `AnnouncementForm`, `AnnouncementsTable` |
-| Component | `AnnouncementBanner` (`resources/js/components/AnnouncementBanner`) — sticky banner registered in the `app::page.before` global component slot |
+| Components | `AnnouncementBanner` (`resources/js/{vue,react}/components/`) — the sticky banner from props (`text`, `dismissable`, `open`; `dismiss` event), sliding in and out as `open` changes, with stories. `AnnouncementBannerSlot` — reads the page, picks the audience, posts the dismissal, and closes the banner when the next page drops the prop; registered in the `app::page.before` slot, covered by E2E |
 | Types | `resources/js/types/index.ts` — `Announcement` interface |
 
 ## Routes
@@ -54,13 +54,13 @@ Two boolean flags on the model:
 - `show_on_frontend` — show on public (unauthenticated) pages
 - `show_on_dashboard` — show on authenticated pages
 
-The provider shares the newest active announcement for the visitor's audience (signed in: `show_on_dashboard`, else `show_on_frontend`), so a newer one for the other audience never hides it. `AnnouncementBanner` still checks the same flag before rendering.
+The provider shares the newest active announcement for the visitor's audience (signed in: `show_on_dashboard`, else `show_on_frontend`), so a newer one for the other audience never hides it. `AnnouncementBannerSlot` still checks the same flag before rendering.
 
 ### Creator Tracking
 `CreateAnnouncement::mutateFormDataBeforeCreate()` sets `created_by = auth()->id()` automatically.
 
 ### Core Integration
-No patches. The module's `resources/js/app` entry calls `registerGlobalComponent('app::page.before', AnnouncementBanner)` in `setup()`, and core renders that slot.
+No patches. The module's `resources/js/app` entry calls `registerGlobalComponent('app::page.before', AnnouncementBannerSlot)` in `setup()`, and core renders that slot.
 
 The `announcement` TypeScript type is handled automatically via `resources/js/types/page-props.d.ts`, which augments `@inertiajs/core`'s `PageProps` — no manual core edit required.
 
